@@ -4,7 +4,7 @@ Plugin Name: CW
 */
 
 add_action( 'widgets_init', function(){
-	register_widget( 'Foo_Widget' );
+	register_widget( 'Image_Widget' );
 });
 
 
@@ -14,7 +14,8 @@ add_action('admin_enqueue_scripts' , function() {
 	wp_enqueue_script('thickbox');
 	wp_enqueue_style('thickbox');
 });
-class Foo_Widget extends WP_Widget {
+
+class Custom_Widget extends WP_Widget {
 
 	protected $elements = array();
 	/**
@@ -22,31 +23,14 @@ class Foo_Widget extends WP_Widget {
 	 */
 	function __construct() {
 		parent::__construct(
-			'foo_widget', // Base ID
-			__( 'Widget Title', 'text_domain' ), // Name
+			'image_widget', // Base ID
+			__( 'Feature Widget', 'text_domain' ), // Name
 			array( 'description' => __( 'A Foo Widget', 'text_domain' ), ) // Args
 			);
-
-
 		$this->elements[] = array(
-			'type' => 'number' ,
-			'id' =>	'test',
-			'title'	=> 'Hello',
-			'placeholder' => 'this is the placeholder' , 
-			);
-
-
-		$this->elements[] = array(
-			'type' => 'text' ,
+			'type' => 'image' ,
 			'id' =>	'asdasd',
 			'title'	=> 'fdssfdfsdfds',
-			'placeholder' => 'this sfsdf the placeholder' , 
-			);
-
-		$this->elements[] = array(
-			'type' => 'wysiwyg' ,
-			'id' =>	'nix',
-			'title'	=> 'Nicky',
 			'placeholder' => 'this sfsdf the placeholder' , 
 			);
 	}
@@ -147,20 +131,54 @@ class Foo_Widget extends WP_Widget {
 					?>
 					<?php add_thickbox(); ?>
 					<div id="my-content-id" style="display:none;">
-					
-							<?php 
-							wp_editor( $value, 'editor', $args );
 
-							?>
-						
+						<?php 
+						wp_editor( $value, 'editor', $args );
+
+						?>	
 					</div>
-
 					<a href="#TB_inline?inlineId=my-content-id" class="thickbox">View my inline content!</a>	
-					
+					<?php
+					break;
+					case 'image':
+					?>
+					<?php $id = $this->get_field_id( $arr['id'] ); ?>
+					<?php if(isset($id)) {
+						?>
+						<img id="<?php echo esc_attr($value); ?>-image" src="<?php echo esc_attr($value); ?>" alt="" width="150px">
+						<?php
+					}
+					?>
+					<p>
+						<input type="text" 
+						name="<?php echo $this->get_field_name( $arr['id'] ); ?>"
+						id="<?php echo $this->get_field_id( $arr['id'] ); ?>"
+						value="<?php if(isset($value)) {echo esc_attr($value);}?>">	
+					</p>
 
+					<input class="upload_image_button button button-primary" type="button" value="Upload Image" />
+					<script>
+						jQuery(document).ready(function($) {
+							jQuery(document).on("click", ".upload_image_button", function() {
+								jQuery.data(document.body, 'prevElement', jQuery(this).prev());
+								window.send_to_editor = function(html) {
+									var imgurl = jQuery('img',html).attr('src');
+									var inputText = jQuery.data(document.body, 'prevElement');
+									if(inputText != undefined && inputText != '')
+									{
+										inputText.val(imgurl);
+										jQuery('#cat_settings\\[<?php echo $setting['id']; ?>\\]-image').attr('src' , imgurl )
+									}
+									tb_remove();
+								};
+								tb_show('', 'media-upload.php?type=image&TB_iframe=true');
+								return false;
+							});
+						});
+					</script>
 
 					<?php
 					break;
 				}
 			} 
-} // class Foo_Widget
+} // class Image_Widget
