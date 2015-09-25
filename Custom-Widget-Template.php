@@ -145,7 +145,7 @@ class Custom_Widget extends WP_Widget {
 					<?php $id = $this->get_field_id( $arr['id'] ); ?>
 					<?php if(isset($id)) {
 						?>
-						<img id="<?php echo esc_attr($value); ?>-image" src="<?php echo esc_attr($value); ?>" alt="" width="150px">
+						<img id="<?php echo $id; ?>-image" src="<?php echo esc_attr($value); ?>" alt="" width="150px">
 						<?php
 					}
 					?>
@@ -153,7 +153,7 @@ class Custom_Widget extends WP_Widget {
 						<input type="text" 
 						name="<?php echo $this->get_field_name( $arr['id'] ); ?>"
 						id="<?php echo $this->get_field_id( $arr['id'] ); ?>"
-						value="<?php if(isset($value)) {echo esc_attr($value);}?>">	
+						value="<?php if(isset($instance[$arr['id']])) { echo $instance[$arr['id']];} ?>">	
 					</p>
 
 					<input class="upload_image_button button button-primary" type="button" value="Upload Image" />
@@ -163,11 +163,11 @@ class Custom_Widget extends WP_Widget {
 								jQuery.data(document.body, 'prevElement', jQuery(this).prev());
 								window.send_to_editor = function(html) {
 									var imgurl = jQuery('img',html).attr('src');
-									var inputText = jQuery.data(document.body, 'prevElement');
+									var inputText = jQuery("#<?php echo $this->get_field_id( $arr['id'] ); ?>");
 									if(inputText != undefined && inputText != '')
 									{
 										inputText.val(imgurl);
-										jQuery('#cat_settings\\[<?php echo $setting['id']; ?>\\]-image').attr('src' , imgurl )
+										jQuery('#<?php echo $id; ?>-image').attr('src' , imgurl )
 									}
 									tb_remove();
 								};
@@ -176,6 +176,27 @@ class Custom_Widget extends WP_Widget {
 							});
 						});
 					</script>
+
+					<?php
+					break;
+					case 'checkbox':
+					?>
+					<p>
+						<label for="<?php echo $this->get_field_id( $arr['id'] ); ?>"><?php echo $arr['title']; ?></label> 
+						<input class="widefat" id="<?php echo $this->get_field_id( $arr['id'] ); ?>" name="<?php echo $this->get_field_name( $arr['id'] ); ?>" type="checkbox">
+					</p>
+					<?php 
+					if (isset($value) && $value == 'on') {
+						?>
+						<script>
+							jQuery(document).ready(function($) {
+								jQuery('#<?php echo $this->get_field_id( $arr['id'] ); ?>').click();
+							});
+						</script>
+
+						<?php
+					}
+					?>
 
 					<?php
 					break;
